@@ -1,0 +1,47 @@
+Install OpenSSH Server
+
+To communicate with our Raspberry Pi from a computer or phone, we'll need to be able to log in. To do so, we can use SSH to connect via any Wi-Fi connection we share with the Pi. SSH, or the Secure Shell, is a network protocol that allows us to run commands remotely on a device. This means we don't need to plug in a screen to interact with our Pi.
+
+In a terminal, run the following to install openSSH server and update the runlevels to allow SSH to start on boot:
+
+    apt-get install openssh-server
+    update-rc.d -f ssh remove
+    update-rc.d -f ssh defaults
+
+The default keys represent a huge vulnerability since anyone can guess them. Let's change them immediately by running the following commands:
+
+    cd /etc/ssh/
+    mkdir insecure_old
+    mv ssh_host* insecure_old
+    dpkg-reconfigure openssh-server
+
+This backs up the old SSH keys in another folder and generates new keys. Problem solved! Now let's make sure we can log in via root by typing:
+
+    nano /etc/ssh/sshd_config
+
+This will open your SSH configuration folder. Change this line:
+
+    PermitRootLogin without-password
+
+To this line instead:
+
+    PermitRootLogin yes
+
+And type Ctrl O to save the changes. If it already is correct, you don't need to change anything.
+Great! Let's restart the SSH service by typing:
+
+    sudo service ssh restart
+    update-rc.d -f ssh enable 2 3 4 5
+
+Finally, to test that we've got SSH working, use the following to see if SSH is currently running.
+
+    sudo service ssh status
+
+If it's not, run this to get it going:
+
+    sudo service ssh start
+
+If you find SSH doesn't work, you can use raspi-config as a workaround. 
+It's meant for Jessie, but it'll work on Kali, too. 
+To use it, first clone from GitHub, type sudo mount /dev/mmcblk0p1 /boot to mount the boot partition, cd to the directory, 
+and run sudo bash raspi-config.
