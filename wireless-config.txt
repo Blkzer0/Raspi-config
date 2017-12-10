@@ -1,0 +1,57 @@
+Configuration for raspberry pi zero.
+The configuration is so that we can connect the pi to our chosen Access Point on boot.
+
+First we will need to confirgure the interfaces located at: /etc/network/interfaces.txt
+
+Change the first line to: "auto wlan0"
+than at the very bottom, add lines telling the pi to use the wpa_supplicant configuration file to connect to the wifi ap.
+
+-------------------------------------------------
+allow-hotplug wlan0
+iface wlan0 inet dhcp (or static)
+[static address configuration here]
+wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+iface default inet dhcp (or static)
+-------------------------------------------------
+
+If you need a static address when connecting the pi to the wifi, add these lines before the wpa-conf line:
+--------------------------------------------
+address 192.168.6.66 <-- static ip you want
+netmask 255.255.255.0
+gateway 192.168.x.x <-- Ip of router
+--------------------------------------------
+
+Next comes the configuration of the wpa_supplicant file.
+We have to change directory to: /etc/wpa_supplcant
+If there is no wpa.conf file, make one and rename it as wpa_supplicant.
+The following configuration is only for the conf file.
+
+network={
+ssid="network-name"
+psk="network-pass"
+proto=RSN
+key-mgmt=WPA-PSK
+pairwise=CCMP
+auth_alg=OPEN
+}
+
++proto= RSN(WPA2) or WPA (WPA1)
++key_mgmt= WPA-PSK(normal) or WPA-EAP(Enterprise network)
++pairwise= CCMP(WPA2) or TKIP (WPA1)
++auth_alg= mostly OPEN, or LEAP & SHARED
+
+==== ArchLinux configuration for pi =====
+
+
+The following applies for the standard wireless connections using a pre-shared key (WPA-PSK).
+
+/etc/netctl/wireless-wpa
+
+Description='A simple WPA encrypted wireless connection using 256-bit PSK'
+Interface=wlp2s2
+Connection=wireless
+Security=wpa
+IP=dhcp
+ESSID=your_essid
+Key=\"64cf3ced850ecef39197bb7b7b301fc39437a6aa6c6a599d0534b16af578e04a
+
